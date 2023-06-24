@@ -31,3 +31,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 // 7. Si el token no es válido o ha expirado, el servidor rechaza la solicitud y devuelve un error de autenticación.
 
 
+  

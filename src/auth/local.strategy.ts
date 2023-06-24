@@ -6,17 +6,23 @@ import { AuthService } from './auth.service';
 import { FastifyReply } from 'fastify';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
 
+//Esto es simplemente un sevicio , que si recordamos , un servicio es una clase que se expota , decorada con el injectable
+
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
-    super();
+    super({
+      usernameField: 'email', //username field (lo colocamos asi porque por defecto laestrategia por defecto viene configurada con el username , pero nosotros vamos a usar el email)
+      passwordField: 'password',
+    });
   }
 
-  async validate(loginUserDto:LoginUserDto,@Response() reply:FastifyReply): Promise<any> {
-    const user = await this.authService.login(reply,loginUserDto);
-    // if (!user) {
-    //   throw new UnauthorizedException();
-    // }
+  async validate(email:string,password:string): Promise<any> {
+    const user = await this.authService.validateUser(email,password);
+    console.log("entre a la localStrategy funcion validate me encargo de guardar el usuario, y valido si ese retorno de validateUser es nulo o no de acuerdo a eso mi funcion es responder al cliente con un error , pero si no , retorno el user para el controlador de login en authLogin" );
+    if (!user) {
+      throw new UnauthorizedException('contraseña o email incorrecto');
+    }
     //si todo sale bien , en user vamos a almacenar el user 
     return user;
   }

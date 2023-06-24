@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { FastifyReply } from 'fastify';
-import { response } from 'src/helpers/Response';
+import { response } from 'src/common/helpers/Response';
 import { LoginUserDto } from './dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -41,7 +41,7 @@ export class UsersService {
     try {
       const email = createUserDto.email;
       const user = await this.usersRepository.findOne({ where: { email } });
-      console.log(user)
+      console.log(user);
       if (user) {
         return response(
           reply,
@@ -61,7 +61,7 @@ export class UsersService {
       //*____________________________________________________________________________________________-
 
       const newUser = this.usersRepository.create(createUserDto);
-      await this.usersRepository.save(newUser)  
+      await this.usersRepository.save(newUser);
       // delete newUser.password
       return response(
         reply,
@@ -96,9 +96,6 @@ export class UsersService {
   //   }
   // }
 
-
-
-
   async findAll() {
     try {
       const users = await this.usersRepository.find();
@@ -108,29 +105,26 @@ export class UsersService {
     }
   }
 
-  async findAll1(reply:FastifyReply) {
+  async findAll1(reply: FastifyReply) {
     try {
       const users = await this.usersRepository.find();
-      response(reply,200,true,users,"Lista de usuarios")
+      response(reply, 200, true, users, 'Lista de usuarios');
     } catch (error) {
       return this.catch(reply, error, 'userService findAll1');
     }
   }
 
-
-  async findOne(id: number,reply:FastifyReply) {
-   try {
-     const user = await this.usersRepository.findOne({where:{id}})
-     if(!user){
-      return response(reply,404,false,null,"Usuario no encontrado")
-     }
-     return response(reply,200,true,user,"Usuario encontrado")
-   } catch (error) {
-    return this.catch(reply, error, 'userService findOne');
-   }
+  async findOne(id: number, reply: FastifyReply) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { id } });
+      if (!user) {
+        return response(reply, 404, false, null, 'Usuario no encontrado');
+      }
+      return response(reply, 200, true, user, 'Usuario encontrado');
+    } catch (error) {
+      return this.catch(reply, error, 'userService findOne');
+    }
   }
-
-
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
@@ -148,5 +142,11 @@ export class UsersService {
       null,
       `Ha ocurrido un error en ${nameFunction} , error : ${error}`,
     );
+  }
+
+  //vamos a hacer un metodo para buscar un usuario por el email, esta funcion esta relacionada con el localPaspport y el validate de auth.service
+
+  async findByEmail(email: string) {
+    return await this.usersRepository.findOne({ where: { email } });
   }
 }

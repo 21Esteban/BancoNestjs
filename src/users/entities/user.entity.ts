@@ -30,7 +30,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({select:false}) //asi no aparecen las passwords en las peticiones
+  @Column() //asi no aparecen las passwords en las peticiones
   password: string;
 
   @Column({

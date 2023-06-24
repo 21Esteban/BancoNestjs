@@ -14,10 +14,11 @@ import { jwtConstants } from './constants';
 
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService,LocalStrategy],
+  providers: [AuthService,LocalStrategy,JwtStrategy],
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
@@ -28,7 +29,7 @@ import { LocalStrategy } from './local.strategy';
 
       //!Implementando la protección de autenticación #
       // Ahora podemos abordar nuestro requisito final: proteger los puntos finales al exigir que un JWT válido esté presente en la solicitud. Haremos esto creando un AuthGuardque podamos usar para proteger nuestras rutas.
-    }),PassportModule 
+    }),PassportModule ,UsersModule
   ],
 })
 export class AuthModule {}
