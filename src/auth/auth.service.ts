@@ -88,8 +88,8 @@ export class AuthService {
 
   async login(user: User, reply: FastifyReply) {
     try {
-      const payload = { username: user.name, id: user.id };
-      // console.log(user);
+      const payload = { username: user.name, id: user.id,role:user.role };
+      console.log(user);
       const token = this.jwtService.sign(payload);
       return response(reply, 200, true,{...user,token}, 'Bienvenido');
     } catch (error: any) {

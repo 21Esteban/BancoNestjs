@@ -8,6 +8,7 @@ import { FastifyReply } from 'fastify';
 import { response } from 'src/common/helpers/Response';
 import { LoginUserDto } from './dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 //Vamos a usar Fastify para las Request y los Response
 
@@ -16,6 +17,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private jwtService: JwtService
   ) {}
 
   //Respuesta sin manejar el request y el reply de fastify
@@ -62,12 +64,13 @@ export class UsersService {
 
       const newUser = this.usersRepository.create(createUserDto);
       await this.usersRepository.save(newUser);
+      const token = this.jwtService.sign({id:newUser.id,username:newUser.name,role:newUser.role});
       // delete newUser.password
       return response(
         reply,
         201,
         true,
-        newUser,
+        {...newUser,token},
         'Usuario creado correctamente',
       );
     } catch (error) {

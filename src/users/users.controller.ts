@@ -46,10 +46,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
   
-  @UseGuards(RolesGuard)
-  @Roles(userRole.EMPLOYEE)
+  
+  
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
   @Get()
+  @Roles(userRole.EMPLOYEE)
   findAll1(@Response() reply:FastifyReply) {
     return this.usersService.findAll1(reply);
   }

@@ -1,22 +1,63 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from 'src/common/decorators/roles.decorator';
 import { userRole } from 'src/users/entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import { error } from 'console';
+import { response } from 'src/common/helpers/Response';
+import { FastifyReply } from 'fastify';
+
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector,
+    private jwtService: JwtService,
+    ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<userRole[]>(ROLES_KEY, [
+      
+      //obtiene los roles o metadatos que tiene un controlador o ruta
       context.getHandler(),
+      //obtiene los roles o metadatos de la clase completa
       context.getClass(),
     ]);
+
+    console.log("entre al roles.guard");
+    console.log(requiredRoles);
     if (!requiredRoles) {
       return true;
     }
-    const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    const request = context.switchToHttp().getRequest();
+    // console.log(request);
+    const token = request.raw.rawHeaders[1].split(" ")[1];
+    // const bearerToken = request.headers.authorization; otra forma de obtener el token
+    
+      const decoded = this.jwtService.verify(token)
+      console.log(decoded);
+      const roles = decoded.role
+      console.log(roles);
+      const hasRequiredRole  =  requiredRoles.some((role) => roles?.includes(role)); //esto nos retorna un boolean
+      console.log(hasRequiredRole );
+      if (!hasRequiredRole ){
+        console.log("hola");
+        throw new HttpException(
+          'No tienes los permisos necesarios para acceder a este recurso.',
+          HttpStatus.UNAUTHORIZED,
+           
+        );
+      
+      }
+      return hasRequiredRole  
+    
+      // console.log(`Error en el guardian de roles (roles.guard.ts) : ${error.message}`);
+      // throw new HttpException(
+      //   'No tienes los permisos necesarios para acceder a este recurso.',
+      //   HttpStatus.UNAUTHORIZED,
+         
+      // );
+    
+    
   }
 }
 

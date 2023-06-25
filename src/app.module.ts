@@ -10,6 +10,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 
 
+
+
 @Module({
   //vamos a inportar el Config module para usar variables de entorno globales
 
@@ -53,7 +55,8 @@ import { AuthModule } from './auth/auth.module';
 
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+   
   ],
   controllers: [AppController],
   providers: [AppService],
